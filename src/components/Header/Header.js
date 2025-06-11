@@ -46,7 +46,7 @@ const Header = ({ activeTab, setActiveTab, cart, isOnline, user, onLogout }) => 
                 </span>
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <MapPin className="h-3 w-3" />
-                  <span>Redrapur Chauraha</span>
+                  <span>Rudrapur Deoria</span>
                   {isOnline ? (
                     <Wifi className="h-3 w-3 text-green-400" />
                   ) : (

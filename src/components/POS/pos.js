@@ -387,110 +387,175 @@ const POS = ({ products, cart, setCart, setScanMode }) => {
 
   const ReceiptModal = () => {
     if (!showReceipt || !currentSale) return null;
-
+  
+    // Format date and time properly
+    const formatDateTime = (dateString) => {
+      const date = new Date(dateString);
+      const dateOptions = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+      };
+      const timeOptions = { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+      };
+      
+      return {
+        date: date.toLocaleDateString('en-IN', dateOptions),
+        time: date.toLocaleTimeString('en-IN', timeOptions)
+      };
+    };
+  
+    const { date, time } = formatDateTime(currentSale.created_at);
+  
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white text-black rounded-xl p-8 w-full max-w-md max-h-90vh overflow-y-auto" id="receipt">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold">PRAKASH ELECTRONICS</h1>
-            <p className="text-sm text-gray-600">Redrapur Chauraha</p>
-            <p className="text-sm text-gray-600">Phone: +91-XXXXXXXXXX</p>
-            <p className="text-sm text-gray-600">GST: 07XXXXX1234X1XX</p>
-          </div>
-
-          <div className="border-t border-b border-gray-300 py-4 mb-4">
-            <div className="flex justify-between text-sm">
-              <span>Receipt #: {currentSale.sale_number}</span>
-              <span>{new Date(currentSale.created_at).toLocaleString()}</span>
+        <div className="bg-white text-black w-full max-w-sm max-h-[90vh] overflow-y-auto font-mono" id="receipt">
+          {/* Receipt Paper */}
+          <div className="p-4 border-2 border-dashed border-gray-300">
+            
+            {/* Store Header */}
+            <div className="text-center border-b border-gray-400 pb-3 mb-3">
+              <h1 className="text-xl font-bold tracking-wider">PRAKASH ELECTRONICS</h1>
+              <p className="text-sm">Rudrapur Deoria</p>
+              <p className="text-sm">Phone: +91-9555993557</p>
+              <p className="text-xs">GST: 09DYPPS5702H1ZV</p>
             </div>
-            {currentSale.customer_name && (
-              <div className="text-sm mt-2">
-                <p>Customer: {currentSale.customer_name}</p>
-                {currentSale.customer_phone && <p>Phone: {currentSale.customer_phone}</p>}
-              </div>
-            )}
-          </div>
-
-          <div className="mb-4">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Item</th>
-                  <th className="text-center py-2">Qty</th>
-                  <th className="text-right py-2">Price</th>
-                  <th className="text-right py-2">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentSale.items.map((item, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="py-2">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-xs text-gray-600">{item.brand}</p>
-                      </div>
-                    </td>
-                    <td className="text-center py-2">{item.quantity}</td>
-                    <td className="text-right py-2">₹{item.price.toFixed(2)}</td>
-                    <td className="text-right py-2">₹{(item.price * item.quantity).toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="border-t border-gray-300 pt-4 mb-4">
-            <div className="space-y-2 text-sm">
+  
+            {/* Receipt Details */}
+            <div className="text-sm mb-3 border-b border-gray-400 pb-3">
               <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <span>₹{currentSale.totals.subtotal.toFixed(2)}</span>
-              </div>
-              {currentSale.totals.discountAmount > 0 && (
-                <div className="flex justify-between">
-                  <span>Discount:</span>
-                  <span>-₹{currentSale.totals.discountAmount.toFixed(2)}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span>GST (18%):</span>
-                <span>₹{currentSale.totals.tax.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between font-bold text-lg border-t border-gray-300 pt-2">
-                <span>Total:</span>
-                <span>₹{currentSale.totals.total.toFixed(2)}</span>
+                <span>Receipt #:</span>
+                <span>{currentSale.sale_number}</span>
               </div>
               <div className="flex justify-between">
-                <span>Payment:</span>
-                <span>{currentSale.payment_method.toUpperCase()}</span>
+                <span>Date:</span>
+                <span>{date}</span>
               </div>
-              {currentSale.payment_method === 'cash' && (
+              <div className="flex justify-between">
+                <span>Time:</span>
+                <span>{time}</span>
+              </div>
+              {currentSale.customer_name && (
                 <>
                   <div className="flex justify-between">
-                    <span>Received:</span>
-                    <span>₹{currentSale.receivedAmount.toFixed(2)}</span>
+                    <span>Customer:</span>
+                    <span>{currentSale.customer_name}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Change:</span>
-                    <span>₹{currentSale.change.toFixed(2)}</span>
-                  </div>
+                  {currentSale.customer_phone && (
+                    <div className="flex justify-between">
+                      <span>Phone:</span>
+                      <span>{currentSale.customer_phone}</span>
+                    </div>
+                  )}
                 </>
               )}
             </div>
+  
+            {/* Items */}
+            <div className="mb-3">
+              <div className="border-b border-gray-400 pb-1 mb-2">
+                <div className="text-xs font-bold">
+                  ITEM                 QTY   PRICE    TOTAL
+                </div>
+              </div>
+              {currentSale.items.map((item, index) => (
+                <div key={index} className="text-xs mb-2">
+                  <div className="font-semibold">{item.name}</div>
+                  <div className="text-gray-600 text-xs">{item.brand}</div>
+                  <div className="flex justify-between">
+                    <span className="w-16 text-center">{item.quantity}</span>
+                    <span className="w-16 text-right">₹{item.price.toFixed(2)}</span>
+                    <span className="w-20 text-right font-semibold">₹{(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+  
+            {/* Totals */}
+            <div className="border-t border-gray-400 pt-2 mb-3">
+              <div className="text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span>SUBTOTAL:</span>
+                  <span>₹{currentSale.totals.subtotal.toFixed(2)}</span>
+                </div>
+                
+                {currentSale.totals.discountAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span>DISCOUNT:</span>
+                    <span>-₹{currentSale.totals.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between">
+                  <span>GST (18%):</span>
+                  <span>₹{currentSale.totals.tax.toFixed(2)}</span>
+                </div>
+                
+                <div className="border-t border-gray-400 pt-1 mt-2">
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>TOTAL:</span>
+                    <span>₹{currentSale.totals.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            {/* Payment Info */}
+            <div className="border-t border-gray-400 pt-2 mb-3">
+              <div className="text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span>PAYMENT:</span>
+                  <span>{currentSale.payment_method.toUpperCase()}</span>
+                </div>
+                
+                {currentSale.payment_method === 'cash' && (
+                  <>
+                    <div className="flex justify-between">
+                      <span>RECEIVED:</span>
+                      <span>₹{currentSale.receivedAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>CHANGE:</span>
+                      <span>₹{currentSale.change.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+  
+            {/* Footer */}
+            <div className="text-center text-xs border-t border-gray-400 pt-3">
+              <div className="mb-2">
+                <p className="font-bold">*** TERMS & CONDITIONS ***</p>
+              </div>
+              <div className="text-left mb-3 space-y-1">
+                <p>* Goods once sold cannot be returned</p>
+                <p>* Warranty as per manufacturer terms</p>
+                <p>* Subject to local jurisdiction</p>
+              </div>
+              
+              <div className="border-t border-gray-400 pt-2 mb-3">
+                <p className="font-bold">THANK YOU FOR SHOPPING WITH US!</p>
+                <p>VISIT US AGAIN!</p>
+                <p className="font-bold">WITH LOVE FROM PRAKASH ELECTRONICS</p>
+              </div>
+              
+              <div className="border-t border-gray-400 pt-2 text-xs">
+                <p>Made with ❤️ by <strong>CodeNest Labs</strong></p>
+                <p>Contact: adi7753071602@gmail.com</p>
+              </div>
+            </div>
+  
           </div>
-
-          <div className="text-center text-xs text-gray-600 mb-4">
-            <p>*** TERMS & CONDITIONS ***</p>
-            <p>• Goods once sold cannot be returned</p>
-            <p>• Warranty as per manufacturer terms</p>
-            <p>• Subject to local jurisdiction</p>
-            <p className="mt-2">Thank you for shopping with us!</p>
-            <p>Visit us again!</p>
-          </div>
-
-          <div className="flex space-x-4">
+  
+          {/* Action Buttons */}
+          <div className="flex space-x-4 p-4">
             <button
               onClick={printReceipt}
-              className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+              className="flex-1 py-2 bg-black hover:bg-gray-800 text-white rounded transition-colors flex items-center justify-center"
             >
               <Printer className="h-4 w-4 mr-2" />
               Print
@@ -500,7 +565,7 @@ const POS = ({ products, cart, setCart, setScanMode }) => {
                 setShowReceipt(false);
                 setCurrentSale(null);
               }}
-              className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+              className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
             >
               Close
             </button>
