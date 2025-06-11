@@ -17,6 +17,184 @@ import {
   Search
 } from 'lucide-react';
 
+// Move CheckoutModal outside of POS component
+const CheckoutModal = ({ 
+  show, 
+  onClose, 
+  customerInfo, 
+  setCustomerInfo, 
+  paymentMethod, 
+  setPaymentMethod, 
+  discount, 
+  setDiscount, 
+  receivedAmount, 
+  setReceivedAmount, 
+  total, 
+  subtotal, 
+  discountAmount, 
+  tax, 
+  loading, 
+  onComplete 
+}) => {
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-white">Checkout</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white p-2"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {/* Customer Info */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Customer Name
+            </label>
+            <input
+              type="text"
+              value={customerInfo.name}
+              onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              placeholder="Optional"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={customerInfo.phone}
+              onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              placeholder="Optional"
+            />
+          </div>
+
+          {/* Payment Method */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Payment Method
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setPaymentMethod('cash')}
+                className={`flex items-center justify-center p-3 rounded-lg transition-colors ${
+                  paymentMethod === 'cash' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                <Banknote className="h-5 w-5 mr-1" />
+                Cash
+              </button>
+              <button
+                onClick={() => setPaymentMethod('card')}
+                className={`flex items-center justify-center p-3 rounded-lg transition-colors ${
+                  paymentMethod === 'card' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                <CreditCard className="h-5 w-5 mr-1" />
+                Card
+              </button>
+              <button
+                onClick={() => setPaymentMethod('upi')}
+                className={`flex items-center justify-center p-3 rounded-lg transition-colors ${
+                  paymentMethod === 'upi' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                UPI
+              </button>
+            </div>
+          </div>
+
+          {/* Discount */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Discount (%)
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={discount}
+              onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          {/* Received Amount (Cash only) */}
+          {paymentMethod === 'cash' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Received Amount (₹)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={receivedAmount}
+                onChange={(e) => setReceivedAmount(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                placeholder="Enter received amount"
+              />
+              {receivedAmount && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Change: ₹{Math.max(0, parseFloat(receivedAmount) - total).toFixed(2)}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Order Summary */}
+          <div className="border-t border-gray-700 pt-4">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Subtotal:</span>
+                <span className="text-white">₹{subtotal.toFixed(2)}</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Discount:</span>
+                  <span className="text-red-400">-₹{discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-gray-400">GST (18%):</span>
+                <span className="text-white">₹{tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg border-t border-gray-700 pt-2">
+                <span className="text-white">Total:</span>
+                <span className="text-green-400">₹{total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Complete Sale Button */}
+          <button
+            onClick={onComplete}
+            disabled={loading}
+            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Processing...' : 'Complete Sale'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const POS = ({ products, cart, setCart, setScanMode }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -206,166 +384,6 @@ const POS = ({ products, cart, setCart, setScanMode }) => {
   };
 
   const { subtotal, discountAmount, tax, total } = calculateTotals();
-
-  const CheckoutModal = () => {
-    if (!showCheckout) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Checkout</h2>
-            <button
-              onClick={() => setShowCheckout(false)}
-              className="text-gray-400 hover:text-white p-2"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {/* Customer Info */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Customer Name
-              </label>
-              <input
-                type="text"
-                value={customerInfo.name}
-                onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                placeholder="Optional"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={customerInfo.phone}
-                onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                placeholder="Optional"
-              />
-            </div>
-
-            {/* Payment Method */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Payment Method
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setPaymentMethod('cash')}
-                  className={`flex items-center justify-center p-3 rounded-lg transition-colors ${
-                    paymentMethod === 'cash' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  <Banknote className="h-5 w-5 mr-1" />
-                  Cash
-                </button>
-                <button
-                  onClick={() => setPaymentMethod('card')}
-                  className={`flex items-center justify-center p-3 rounded-lg transition-colors ${
-                    paymentMethod === 'card' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  <CreditCard className="h-5 w-5 mr-1" />
-                  Card
-                </button>
-                <button
-                  onClick={() => setPaymentMethod('upi')}
-                  className={`flex items-center justify-center p-3 rounded-lg transition-colors ${
-                    paymentMethod === 'upi' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  UPI
-                </button>
-              </div>
-            </div>
-
-            {/* Discount */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Discount (%)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={discount}
-                onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Received Amount (Cash only) */}
-            {paymentMethod === 'cash' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Received Amount (₹)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={receivedAmount}
-                  onChange={(e) => setReceivedAmount(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                  placeholder="Enter received amount"
-                />
-                {receivedAmount && (
-                  <p className="text-sm text-gray-400 mt-1">
-                    Change: ₹{Math.max(0, parseFloat(receivedAmount) - total).toFixed(2)}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Order Summary */}
-            <div className="border-t border-gray-700 pt-4">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Subtotal:</span>
-                  <span className="text-white">₹{subtotal.toFixed(2)}</span>
-                </div>
-                {discountAmount > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Discount:</span>
-                    <span className="text-red-400">-₹{discountAmount.toFixed(2)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-gray-400">GST (18%):</span>
-                  <span className="text-white">₹{tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg border-t border-gray-700 pt-2">
-                  <span className="text-white">Total:</span>
-                  <span className="text-green-400">₹{total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Complete Sale Button */}
-            <button
-              onClick={completeSale}
-              disabled={loading}
-              className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Processing...' : 'Complete Sale'}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const ReceiptModal = () => {
     if (!showReceipt || !currentSale) return null;
@@ -646,7 +664,24 @@ const POS = ({ products, cart, setCart, setScanMode }) => {
       </div>
 
       {/* Modals */}
-      <CheckoutModal />
+      <CheckoutModal
+        show={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        customerInfo={customerInfo}
+        setCustomerInfo={setCustomerInfo}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+        discount={discount}
+        setDiscount={setDiscount}
+        receivedAmount={receivedAmount}
+        setReceivedAmount={setReceivedAmount}
+        total={total}
+        subtotal={subtotal}
+        discountAmount={discountAmount}
+        tax={tax}
+        loading={loading}
+        onComplete={completeSale}
+      />
       <ReceiptModal />
     </div>
   );

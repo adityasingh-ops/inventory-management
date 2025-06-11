@@ -16,7 +16,7 @@ import {
   X
 } from 'lucide-react';
 
-const Header = ({ activeTab, setActiveTab, cart, isOnline }) => {
+const Header = ({ activeTab, setActiveTab, cart, isOnline, user, onLogout }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -111,13 +111,16 @@ const Header = ({ activeTab, setActiveTab, cart, isOnline }) => {
                 <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-xl shadow-xl border border-gray-700 py-2 z-50">
                   <div className="px-4 py-3 border-b border-gray-700">
                     <p className="text-sm font-medium text-white">Prakash</p>
-                    <p className="text-xs text-gray-400">Shop Owner</p>
+                    <p className="text-xs text-gray-400">{user?.email || 'Shop Owner'}</p>
                   </div>
                   <button className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Settings
                   </button>
-                  <button className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2">
+                  <button 
+                    onClick={onLogout}
+                    className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2"
+                  >
                     <LogOut className="h-4 w-4" />
                     Logout
                   </button>
