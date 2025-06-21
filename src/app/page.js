@@ -15,6 +15,8 @@ const LoginForm = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
+
+  // using login function from supabase
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -206,7 +208,7 @@ function App() {
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
         </div>
-      );
+      );  
     }
 
     switch (activeTab) {

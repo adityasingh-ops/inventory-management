@@ -5,6 +5,9 @@ const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+
+
+/// just for remmbering syntax
 // Database Schema
 export const createTables = async () => {
   // Products table

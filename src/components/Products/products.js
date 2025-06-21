@@ -302,6 +302,8 @@ const Products = ({ products, setProducts, setScanMode, fetchProducts }) => {
     });
   };
 
+  // post request to add product
+  
   const handleAddProduct = async (e) => {
     e.preventDefault();
     setLoading(true);
