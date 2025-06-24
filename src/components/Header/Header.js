@@ -13,21 +13,98 @@ import {
   Wifi,
   WifiOff,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 
-const Header = ({ activeTab, setActiveTab, cart, isOnline, user, onLogout }) => {
+// Navigation items configuration
+const NAV_ITEMS = [
+  { id: 'dashboard', label: 'Dashboard', icon: Home },
+  { id: 'products', label: 'Products', icon: Package },
+  { id: 'pos', label: 'POS', icon: ShoppingCart },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+];
+
+const Header = ({
+  activeTab,
+  setActiveTab,
+  cart,
+  isOnline,
+  user,
+  onLogout,
+}) => {
   const [showProfile, setShowProfile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'products', label: 'Products', icon: Package },
-    { id: 'pos', label: 'POS', icon: ShoppingCart },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 }
-  ];
-
+  // Calculate total cart items
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Render navigation buttons
+  const renderNavButtons = (onClickExtra = () => {}) =>
+    NAV_ITEMS.map(({ id, label, icon: Icon }) => (
+      <button
+        key={id}
+        onClick={() => {
+          setActiveTab(id);
+          onClickExtra();
+        }}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+          activeTab === id
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+            : 'text-gray-300 hover:text-white hover:bg-gray-800'
+        }`}
+      >
+        <Icon className="h-4 w-4" />
+        {label}
+      </button>
+    ));
+
+  // Render profile dropdown
+  const renderProfileDropdown = () =>
+    showProfile && (
+      <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-xl shadow-xl border border-gray-700 py-2 z-50">
+        <div className="px-4 py-3 border-b border-gray-700">
+          <p className="text-sm font-medium text-white">Prakash</p>
+          <p className="text-xs text-gray-400">{user?.email || 'Shop Owner'}</p>
+        </div>
+        <button className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2">
+          <Settings className="h-4 w-4" />
+          Settings
+        </button>
+        <button
+          onClick={onLogout}
+          className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </div>
+    );
+
+  // Render cart indicator if items exist
+  const renderCartIndicator = () =>
+    cartItemCount > 0 && (
+      <div className="relative">
+        <button
+          onClick={() => setActiveTab('pos')}
+          className="p-2 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
+        >
+          <ShoppingCart className="h-5 w-5 text-gray-300" />
+        </button>
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+          {cartItemCount}
+        </span>
+      </div>
+    );
+
+  // Render mobile navigation
+  const renderMobileNav = () =>
+    showMobileMenu && (
+      <div className="lg:hidden mt-4 pt-4 border-t border-gray-800">
+        <nav className="flex flex-col gap-2">
+          {renderNavButtons(() => setShowMobileMenu(false))}
+        </nav>
+      </div>
+    );
 
   return (
     <header className="bg-gray-900 border-b border-gray-800 sticky top-0 z-40">
@@ -59,38 +136,12 @@ const Header = ({ activeTab, setActiveTab, cart, isOnline, user, onLogout }) => 
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-2">
-            {navItems.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-                  activeTab === id
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-800'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </button>
-            ))}
+            {renderNavButtons()}
           </nav>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
-            {/* Cart Indicator */}
-            {cartItemCount > 0 && (
-              <div className="relative">
-                <button 
-                  onClick={() => setActiveTab('pos')}
-                  className="p-2 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
-                >
-                  <ShoppingCart className="h-5 w-5 text-gray-300" />
-                </button>
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {cartItemCount}
-                </span>
-              </div>
-            )}
+            {renderCartIndicator()}
 
             {/* Notifications */}
             <button className="p-2 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors relative">
@@ -101,36 +152,17 @@ const Header = ({ activeTab, setActiveTab, cart, isOnline, user, onLogout }) => 
             {/* Profile Dropdown */}
             <div className="relative">
               <button
-                onClick={() => setShowProfile(!showProfile)}
+                onClick={() => setShowProfile((v) => !v)}
                 className="flex items-center gap-2 p-2 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
               >
                 <User className="h-5 w-5 text-gray-300" />
               </button>
-
-              {showProfile && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800 rounded-xl shadow-xl border border-gray-700 py-2 z-50">
-                  <div className="px-4 py-3 border-b border-gray-700">
-                    <p className="text-sm font-medium text-white">Prakash</p>
-                    <p className="text-xs text-gray-400">{user?.email || 'Shop Owner'}</p>
-                  </div>
-                  <button className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </button>
-                  <button 
-                    onClick={onLogout}
-                    className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </button>
-                </div>
-              )}
+              {renderProfileDropdown()}
             </div>
 
             {/* Mobile Menu Button */}
             <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              onClick={() => setShowMobileMenu((v) => !v)}
               className="lg:hidden p-2 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors"
             >
               {showMobileMenu ? (
@@ -143,29 +175,7 @@ const Header = ({ activeTab, setActiveTab, cart, isOnline, user, onLogout }) => 
         </div>
 
         {/* Mobile Navigation */}
-        {showMobileMenu && (
-          <div className="lg:hidden mt-4 pt-4 border-t border-gray-800">
-            <nav className="flex flex-col gap-2">
-              {navItems.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => {
-                    setActiveTab(id);
-                    setShowMobileMenu(false);
-                  }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                    activeTab === id
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-800'
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  {label}
-                </button>
-              ))}
-            </nav>
-          </div>
-        )}
+        {renderMobileNav()}
       </div>
     </header>
   );
