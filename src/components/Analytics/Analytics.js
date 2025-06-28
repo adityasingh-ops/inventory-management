@@ -1,45 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Package,
-  ShoppingCart,
-  Users,
-  Calendar,
-  Download,
-  Printer,
-  Eye,
-  Filter,
-  Search,
-  ArrowUp,
-  ArrowDown,
-  Clock,
-  AlertTriangle,
-  CheckCircle,
-  XCircle
+  BarChart3, TrendingUp, TrendingDown, DollarSign, Package, ShoppingCart, Users,
+  Calendar, Download, Printer, Eye, Filter, Search, ArrowUp, ArrowDown, Clock,
+  AlertTriangle, CheckCircle, XCircle
 } from 'lucide-react';
 import { supabase } from '@/config/supabase';
 import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
+  LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
 const Analytics = ({ products }) => {
+  // State hooks
   const [dateRange, setDateRange] = useState('7days');
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,18 +27,19 @@ const Analytics = ({ products }) => {
     monthlyTrends: []
   });
 
+  // Fetch analytics data when dateRange or products change
   useEffect(() => {
     fetchAnalytics();
   }, [dateRange, products]);
 
+  // Fetch analytics data from Supabase
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      
+
       // Calculate date range
       const endDate = new Date();
       const startDate = new Date();
-      
       switch (dateRange) {
         case '7days':
           startDate.setDate(endDate.getDate() - 7);
@@ -84,7 +57,7 @@ const Analytics = ({ products }) => {
           startDate.setDate(endDate.getDate() - 7);
       }
 
-      // Fetch sales data
+      // Fetch sales data from Supabase
       const { data: sales, error: salesError } = await supabase
         .from('sales')
         .select(`
@@ -100,11 +73,10 @@ const Analytics = ({ products }) => {
 
       if (salesError) throw salesError;
 
-      // Process analytics data
+      // Process and set analytics
       const processedAnalytics = processAnalyticsData(sales || [], products);
       setAnalytics(processedAnalytics);
       setSalesData(sales || []);
-      
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -112,7 +84,9 @@ const Analytics = ({ products }) => {
     }
   };
 
+  // Process analytics data
   const processAnalyticsData = (sales, products) => {
+    // Totals
     const totalSales = sales.length;
     const totalRevenue = sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount || 0), 0);
     const totalProducts = products.length;
@@ -134,12 +108,11 @@ const Analytics = ({ products }) => {
         productSales[productId].revenue += parseFloat(item.total_price || 0);
       });
     });
-
     const topProducts = Object.values(productSales)
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 5);
 
-    // Category analysis
+    // Category statistics
     const categoryStats = {};
     products.forEach(product => {
       if (!categoryStats[product.category]) {
@@ -154,7 +127,7 @@ const Analytics = ({ products }) => {
       categoryStats[product.category].value += parseFloat(product.price || 0) * (product.stock || 0);
     });
 
-    // Add sales data to categories
+    // Add sales to categories
     sales.forEach(sale => {
       sale.sale_items?.forEach(item => {
         const category = item.products?.category;
@@ -163,10 +136,9 @@ const Analytics = ({ products }) => {
         }
       });
     });
-
     const categoryData = Object.values(categoryStats);
 
-    // Daily sales trends
+    // Daily sales
     const dailyStats = {};
     sales.forEach(sale => {
       const date = new Date(sale.created_at).toISOString().split('T')[0];
@@ -182,7 +154,6 @@ const Analytics = ({ products }) => {
       dailyStats[date].revenue += parseFloat(sale.total_amount || 0);
       dailyStats[date].orders += sale.sale_items?.length || 0;
     });
-
     const dailySales = Object.values(dailyStats).sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // Monthly trends (last 12 months)
@@ -199,7 +170,6 @@ const Analytics = ({ products }) => {
       };
       last12Months.push(monthKey);
     }
-
     sales.forEach(sale => {
       const monthKey = sale.created_at.slice(0, 7);
       if (monthlyStats[monthKey]) {
@@ -207,7 +177,6 @@ const Analytics = ({ products }) => {
         monthlyStats[monthKey].revenue += parseFloat(sale.total_amount || 0);
       }
     });
-
     const monthlyTrends = last12Months.map(key => monthlyStats[key]);
 
     return {
@@ -223,6 +192,7 @@ const Analytics = ({ products }) => {
     };
   };
 
+  // Stat card component
   const StatCard = ({ title, value, icon: Icon, trend, trendValue, color = 'blue' }) => {
     const colorClasses = {
       blue: 'from-blue-600 to-blue-700',
@@ -231,7 +201,6 @@ const Analytics = ({ products }) => {
       orange: 'from-orange-600 to-orange-700',
       red: 'from-red-600 to-red-700'
     };
-
     return (
       <div className={`bg-gradient-to-r ${colorClasses[color]} rounded-xl p-6 text-white shadow-lg`}>
         <div className="flex items-center justify-between">
@@ -240,11 +209,10 @@ const Analytics = ({ products }) => {
             <p className="text-3xl font-bold mt-1">{value}</p>
             {trend && (
               <div className="flex items-center mt-2">
-                {trend === 'up' ? (
-                  <ArrowUp className="h-4 w-4 text-green-300 mr-1" />
-                ) : (
-                  <ArrowDown className="h-4 w-4 text-red-300 mr-1" />
-                )}
+                {trend === 'up'
+                  ? <ArrowUp className="h-4 w-4 text-green-300 mr-1" />
+                  : <ArrowDown className="h-4 w-4 text-red-300 mr-1" />
+                }
                 <span className="text-white/80 text-sm">{trendValue}</span>
               </div>
             )}
@@ -255,8 +223,10 @@ const Analytics = ({ products }) => {
     );
   };
 
+  // Colors for charts
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
 
+  // Loading spinner
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -265,6 +235,7 @@ const Analytics = ({ products }) => {
     );
   }
 
+  // Main dashboard
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -273,11 +244,10 @@ const Analytics = ({ products }) => {
           <h1 className="text-3xl font-bold text-white">Analytics Dashboard</h1>
           <p className="text-gray-400 mt-1">Prakash Electronics - Performance Overview</p>
         </div>
-        
         <div className="flex items-center gap-4">
           <select
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
+            onChange={e => setDateRange(e.target.value)}
             className="bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="7days">Last 7 Days</option>
@@ -285,7 +255,6 @@ const Analytics = ({ products }) => {
             <option value="90days">Last 90 Days</option>
             <option value="1year">Last Year</option>
           </select>
-          
           <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
             <Download className="h-4 w-4" />
             Export
@@ -338,25 +307,27 @@ const Analytics = ({ products }) => {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={analytics.dailySales}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 stroke="#9CA3AF"
                 tick={{ fill: '#9CA3AF' }}
-                tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                tickFormatter={value =>
+                  new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                }
               />
               <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1F2937', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#1F2937',
                   border: '1px solid #374151',
                   borderRadius: '8px',
                   color: '#fff'
                 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="revenue" 
-                stroke="#3B82F6" 
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#3B82F6"
                 strokeWidth={2}
                 dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
               />
@@ -386,9 +357,9 @@ const Analytics = ({ products }) => {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1F2937', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#1F2937',
                   border: '1px solid #374151',
                   borderRadius: '8px',
                   color: '#fff'
@@ -408,24 +379,24 @@ const Analytics = ({ products }) => {
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={analytics.monthlyTrends}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               stroke="#9CA3AF"
               tick={{ fill: '#9CA3AF' }}
             />
             <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF' }} />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1F2937', 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1F2937',
                 border: '1px solid #374151',
                 borderRadius: '8px',
                 color: '#fff'
               }}
             />
-            <Area 
-              type="monotone" 
-              dataKey="revenue" 
-              stroke="#10B981" 
+            <Area
+              type="monotone"
+              dataKey="revenue"
+              stroke="#10B981"
               fill="#10B981"
               fillOpacity={0.3}
             />
@@ -458,7 +429,6 @@ const Analytics = ({ products }) => {
             ))}
           </div>
         </div>
-
         {/* Recent Sales */}
         <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
           <h3 className="text-xl font-semibold text-white mb-6">Recent Sales</h3>
@@ -521,10 +491,10 @@ const Analytics = ({ products }) => {
                         <XCircle className="h-5 w-5 text-red-500 mr-2" />
                       )}
                       <span className={`text-sm ${
-                        category.sales > 10 ? 'text-green-400' : 
+                        category.sales > 10 ? 'text-green-400' :
                         category.sales > 5 ? 'text-yellow-400' : 'text-red-400'
                       }`}>
-                        {category.sales > 10 ? 'Excellent' : 
+                        {category.sales > 10 ? 'Excellent' :
                          category.sales > 5 ? 'Good' : 'Needs Attention'}
                       </span>
                     </div>
