@@ -36,37 +36,36 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 
-# RetailPOS - Point of Sale System
+<div align="center">
+  <img src="/banner.png" alt="RetailPOS Banner" width="100%">
+</div>
 
-A modern, responsive Point of Sale (POS) system built with React and Supabase for retail businesses. Features real-time inventory management, barcode scanning, sales analytics, and offline support.
+A modern, responsive Point of Sale (POS) system built with React and Supabase for retail businesses. Features real-time inventory management, barcode scanning, sales analytics, offline support, and demo mode.
 
-## Features
+## 🚀 Features
 
-- **🛍️ Point of Sale System** - Complete POS interface with cart management
+- **🛍️ Point of Sale System** - Complete POS interface with cart management and checkout
 - **📦 Inventory Management** - Add, edit, and track products with real-time stock updates
-- **📊 Analytics Dashboard** - Sales insights and business analytics
+- **📊 Analytics Dashboard** - Sales insights and comprehensive business analytics
 - **📱 Barcode Scanner** - Integrated barcode scanning for quick product lookup
 - **🔐 User Authentication** - Secure login system with Supabase Auth
+- **🎯 Demo Mode** - Try all features without signing up
 - **🌐 Offline Support** - Works offline with local storage fallback
-- **📱 Responsive Design** - Works on desktop, tablet, and mobile devices
+- **📱 Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
 - **🎨 Modern UI** - Clean, dark theme interface with Tailwind CSS
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Frontend**: React 18, Next.js
+- **Frontend**: React 18, Next.js 14
 - **Backend**: Supabase (PostgreSQL, Auth, Real-time)
 - **Styling**: Tailwind CSS
 - **State Management**: React Hooks
 - **Barcode Scanning**: Custom barcode scanner component
 - **Deployment**: Vercel/Netlify ready
 
-## Prerequisites
+## 📋 Prerequisites
 
 Before you begin, ensure you have:
 - Node.js 18+ installed
 - A Supabase account and project
 - Basic knowledge of React and JavaScript
-
-## Installation
-
-1. **Clone the repository**
