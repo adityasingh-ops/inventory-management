@@ -9,14 +9,12 @@ import BarcodeScanner from '@/components/BarCodeScanner/BarCodeScanner';
 import { supabase } from '@/config/supabase';
 
 // Login Component
-const LoginForm = ({ onLogin }) => {
+const LoginForm = ({ onLogin, onDemo }) => { // Add onDemo prop
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-
-  // using login function from supabase
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -78,6 +76,30 @@ const LoginForm = ({ onLogin }) => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        {/* Add Demo Button */}
+        <div className="mt-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-900 text-gray-400">or</span>
+            </div>
+          </div>
+          
+          <button
+            type="button"
+            onClick={onDemo}
+            className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+          >
+            Try Demo Mode
+          </button>
+          
+          <p className="mt-2 text-xs text-gray-400">
+            Explore all features without signing up
+          </p>
+        </div>
         
         {message && (
           <p className={`mt-4 text-sm text-center ${
@@ -102,6 +124,58 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false); 
+  const demoProducts = [
+    {
+      id: 'demo-1',
+      name: 'Sample Coffee',
+      price: 4.99,
+      barcode: '1234567890123',
+      stock: 50,
+      category: 'Beverages',
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 'demo-2',
+      name: 'Demo Sandwich',
+      price: 8.50,
+      barcode: '2345678901234',
+      stock: 25,
+      category: 'Food',
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 'demo-3',
+      name: 'Test Snack',
+      price: 2.99,
+      barcode: '3456789012345',
+      stock: 100,
+      category: 'Snacks',
+      created_at: new Date().toISOString()
+    }
+  ];
+
+  // Add demo mode handler
+  const handleDemoMode = () => {
+    setIsDemoMode(true);
+    setProducts(demoProducts);
+    setAuthLoading(false);
+    setLoading(false);
+  };
+
+  // Modify the auth check condition
+  if (authLoading && !isDemoMode) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // Show login form if not authenticated AND not in demo mode
+  if (!user && !isDemoMode) {
+    return <LoginForm onLogin={setUser} onDemo={handleDemoMode} />;
+  }
 
   useEffect(() => {
     // Check initial auth state
