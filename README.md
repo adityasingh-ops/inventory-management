@@ -34,3 +34,39 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+# RetailPOS - Point of Sale System
+
+A modern, responsive Point of Sale (POS) system built with React and Supabase for retail businesses. Features real-time inventory management, barcode scanning, sales analytics, and offline support.
+
+## Features
+
+- **🛍️ Point of Sale System** - Complete POS interface with cart management
+- **📦 Inventory Management** - Add, edit, and track products with real-time stock updates
+- **📊 Analytics Dashboard** - Sales insights and business analytics
+- **📱 Barcode Scanner** - Integrated barcode scanning for quick product lookup
+- **🔐 User Authentication** - Secure login system with Supabase Auth
+- **🌐 Offline Support** - Works offline with local storage fallback
+- **📱 Responsive Design** - Works on desktop, tablet, and mobile devices
+- **🎨 Modern UI** - Clean, dark theme interface with Tailwind CSS
+
+## Tech Stack
+
+- **Frontend**: React 18, Next.js
+- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Styling**: Tailwind CSS
+- **State Management**: React Hooks
+- **Barcode Scanning**: Custom barcode scanner component
+- **Deployment**: Vercel/Netlify ready
+
+## Prerequisites
+
+Before you begin, ensure you have:
+- Node.js 18+ installed
+- A Supabase account and project
+- Basic knowledge of React and JavaScript
+
+## Installation
+
+1. **Clone the repository**
